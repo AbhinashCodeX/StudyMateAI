@@ -1,0 +1,54 @@
+<div class="chat-container">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <h1>🤖 StudyMate AI</h1>
+    <p>Your AI Learning Assistant</p>
+  </div>
+
+  <!-- Chat messages -->
+  <div class="chat-messages" #chatMessages>
+
+    @for (msg of messages(); track $index) {
+
+      <div
+        class="message"
+        [class.user-message]="msg.sender === 'user'"
+        [class.ai-message]="msg.sender === 'ai'"
+      >
+
+        <div class="sender">
+          @if (msg.sender === 'user') {
+            You
+          } @else {
+            🤖 StudyMate AI
+          }
+        </div>
+
+        <div class="message-text">
+          {{ msg.text }}
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+  <!-- Chat input -->
+  <div class="chat-input">
+
+    <input
+      type="text"
+      placeholder="Ask me anything about programming..."
+      [(ngModel)]="message"
+      (keyup.enter)="sendMessage()"
+    />
+
+    <button (click)="sendMessage()">
+      Send
+    </button>
+
+  </div>
+
+</div>
