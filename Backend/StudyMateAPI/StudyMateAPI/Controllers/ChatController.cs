@@ -15,9 +15,10 @@ namespace StudyMateAPI.Controllers
         }
 
         [HttpPost("send")]
-        public IActionResult SendMessage(ChatRequest request)
+        public async Task<IActionResult> SendMessage(ChatRequest request)
         {
-            var response = _chatService.GetResponse(request.Message);
+            var response = await _chatService.GetResponse(request.Message);
+
             return Ok(new
             {
                 reply = response

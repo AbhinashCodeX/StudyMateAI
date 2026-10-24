@@ -2,9 +2,15 @@
 {
     public class ChatService : IChatService
     {
-        public string GetResponse(string message)
+        private readonly IAiService _aiService;
+
+        public ChatService(IAiService aiservice)
         {
-            return $"You asked: {message}";
+            _aiService = aiservice;
+        }
+        public async Task<string> GetResponse(string message)
+        {
+            return await _aiService.GetResponse(message);
         }
     }
 }

@@ -21,6 +21,10 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddHttpClient<IAiService, AiService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:11434/");
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
