@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿
+using System.Net.Http.Json;
+using StudyMateAPI.Models;
 
 namespace StudyMateAPI.Services
 {
@@ -11,27 +13,40 @@ namespace StudyMateAPI.Services
             _httpClient = httpClient;
         }
 
-        public async Task<string> GetResponse(string message)
+        public async Task<string> GetResponse(List<ChatMessage> messages)
         {
             var request = new
             {
                 model = "llama3.2:1b",
-                prompt = message,
+                messages = messages.Select(m => new
+                {
+                    role = m.Role,
+                    content = m.Content
+                }).ToList(),
                 stream = false
             };
 
-            var response = await _httpClient.PostAsJsonAsync("api/generate",request);
+            var response = await _httpClient.PostAsJsonAsync(
+                "api/chat", request);
 
             response.EnsureSuccessStatusCode();
 
-            var result = await response.Content.ReadFromJsonAsync<OllamaResponse>();
+            var result = await response.Content
+                .ReadFromJsonAsync<OllamaChatResponse>();
 
-            return result?.Response ?? "Sorry, I couldn't generate a response.";
+            return result?.Message?.Content
+                ?? "Sorry, I couldn't generate a response.";
         }
     }
 
-    public class OllamaResponse
+    public class OllamaChatResponse
     {
-        public string Response { get; set; } = "";
+        public OllamaMessage? Message { get; set; }
+    }
+
+    public class OllamaMessage
+    {
+        public string Role { get; set; } = "";
+        public string Content { get; set; } = "";
     }
 }

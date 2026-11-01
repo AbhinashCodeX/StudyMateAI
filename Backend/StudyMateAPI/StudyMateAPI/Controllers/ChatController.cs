@@ -17,12 +17,10 @@ namespace StudyMateAPI.Controllers
         [HttpPost("send")]
         public async Task<IActionResult> SendMessage(ChatRequest request)
         {
-            var response = await _chatService.GetResponse(request.Message);
+            var response = await _chatService.GetResponse(request.Messages);
 
-            return Ok(new
-            {
-                reply = response
-            });
+            return Ok(new { reply = response });
         }
+
     }
 }
