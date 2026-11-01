@@ -21,53 +21,61 @@ export class App {
 
   constructor(private http: HttpClient) {}
 
-  sendMessage() {
+ 
+sendMessage() {
 
-    if (this.message.trim() === '') {
-      return;
+  if (this.message.trim() === '') {
+    return;
+  }
+
+  const userMessage = this.message.trim();
+
+  // 1. Add user message
+  this.messages.update(messages => [
+    ...messages,
+    {
+      sender: 'user',
+      text: userMessage
+    }
+  ]);
+
+  // 2. Clear input
+  this.message = '';
+
+  // 3. Convert all messages into Ollama format
+  const chatHistory = this.messages().map(msg => ({
+    role: msg.sender === 'ai' ? 'assistant' : 'user',
+    content: msg.text
+  }));
+
+  // 4. Send conversation history to ASP.NET Core API
+  this.http.post<any>(
+    'https://localhost:7031/api/Chat/send',
+    {
+      messages: chatHistory
+    }
+  ).subscribe({
+
+    next: (response) => {
+
+      console.log('API RESPONSE:', response);
+
+      // 5. Add AI response
+      this.messages.update(messages => [
+        ...messages,
+        {
+          sender: 'ai',
+          text: response.reply
+        }
+      ]);
+
+    },
+
+    error: (error) => {
+      console.error('API ERROR:', error);
     }
 
-    const userMessage = this.message.trim();
+  });
+}
 
-    // Add user message
-    this.messages.update(messages => [
-      ...messages,
-      {
-        sender: 'user',
-        text: userMessage
-      }
-    ]);
-
-    // Clear input
-    this.message = '';
-
-    // Call ASP.NET Core API
-    this.http.post<any>(
-      'https://localhost:7031/api/Chat/send',
-      {
-        message: userMessage
-      }
-    ).subscribe({
-      
-      next: (response) => {
-
-        console.log('API RESPONSE:', response);
-
-        // Add AI response
-        this.messages.update(messages => [
-          ...messages,
-          {
-            sender: 'ai',
-            text: response.reply
-          }
-        ]);
-
-      },
-
-      error: (error) => {
-        console.error('API ERROR:', error);
-      }
-
-    });
-  }
 }
