@@ -11,7 +11,7 @@ import { HttpClient } from '@angular/common/http';
 export class App {
 
   message = '';
-
+  isThinking = signal(false);
   messages = signal([
     {
       sender: 'ai',
@@ -48,6 +48,9 @@ sendMessage() {
     content: msg.text
   }));
 
+  // 4. Show thinking indicator
+  this.isThinking.set(true);
+
   // 4. Send conversation history to ASP.NET Core API
   this.http.post<any>(
     'https://localhost:7031/api/Chat/send',
@@ -59,6 +62,9 @@ sendMessage() {
     next: (response) => {
 
       console.log('API RESPONSE:', response);
+
+      // Stop thinking indicator
+      this.isThinking.set(false);
 
       // 5. Add AI response
       this.messages.update(messages => [
@@ -72,6 +78,9 @@ sendMessage() {
     },
 
     error: (error) => {
+    // Stop thinking indicator
+    this.isThinking.set(false);
+
       console.error('API ERROR:', error);
     }
 

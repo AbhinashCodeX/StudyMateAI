@@ -32,6 +32,16 @@
       </div>
 
     }
+    
+@if (isThinking()) {
+  <div class="message ai-message">
+    <div class="message-content">
+      <span>StudyMate AI is thinking</span>
+      <span class="thinking-dots">...</span>
+    </div>
+  </div>
+}
+
 
   </div>
 
